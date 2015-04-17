@@ -909,7 +909,7 @@
 			if (isNaN(year) || isNaN(month))
 				return;
 			this.picker.find('.datepicker-days thead .datepicker-switch')
-            .text(dates[this.o.language].months[month]+' '+ (this.o.maxViewMode < 2 ? '' : year));
+            .text(dates[this.o.language].months[month]+' '+ (this.o.maxViewMode >= 2 || this.o.showYearInDaysView ? '' : year));
       this.picker.find('tfoot .today')
 						.text(todaytxt)
 						.toggle(this.o.todayBtn !== false);
@@ -922,8 +922,16 @@
 				day = DPGlobal.getDaysInMonth(prevMonth.getUTCFullYear(), prevMonth.getUTCMonth());
 			prevMonth.setUTCDate(day);
 			prevMonth.setUTCDate(day - (prevMonth.getUTCDay() - this.o.weekStart + 7)%7);
+			
+			var offsetDate = new Date(year, currMonth.getUTCMonth());
 			var nextMonth = new Date(prevMonth);
-			nextMonth.setUTCDate(nextMonth.getUTCDate() + 42);
+			var offset = ( offsetDate.getUTCDay() > 0 && offsetDate.getUTCDay() < 5 ) ? 35 : 42;
+
+        		if (offsetDate.getUTCDay() === 0) {
+                		prevMonth.setUTCDate(prevMonth.getUTCDate() + 7);
+            		}
+            		
+			nextMonth.setUTCDate(nextMonth.getUTCDate() + offset);
 			nextMonth = nextMonth.valueOf();
 			var html = [];
 			var clsName;
@@ -1605,7 +1613,8 @@
 		disableTouchKeyboard: false,
 		enableOnReadonly: true,
 		container: 'body',
-		immediateUpdates: false
+		immediateUpdates: false,
+        	showYearInDaysView: false
 	};
 	var locale_opts = $.fn.datepicker.locale_opts = [
 		'format',
